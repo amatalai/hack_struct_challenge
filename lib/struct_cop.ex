@@ -1,0 +1,2 @@
+defmodule StructCop do
+end

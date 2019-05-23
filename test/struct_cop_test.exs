@@ -1,0 +1,2 @@
+defmodule StructCopTest do
+end
