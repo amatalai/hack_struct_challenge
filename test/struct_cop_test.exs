@@ -2,40 +2,32 @@ defmodule StructCopTest do
   use ExUnit.Case, async: true
 
   defmodule DefstructBeforeStructCop do
-    defstruct [:lulz]
+    defstruct [:test]
 
     use StructCop
 
-    def validate(struct) do
-      if struct.lulz, do: raise("for teh lulz!")
-
-      struct
-    end
+    def schema, do: %{test: :integer}
   end
 
   defmodule DefstructAfterStructCop do
     use StructCop
 
-    defstruct [:lulz]
+    defstruct [:test]
 
-    def validate(struct) do
-      if struct.lulz, do: raise("for teh lulz!")
-
-      struct
-    end
+    def schema, do: %{test: :boolean}
   end
 
   test "__using__ can be invoked before defstruct" do
-    assert_raise(RuntimeError, "for teh lulz!", fn ->
-      ast = quote do: %DefstructBeforeStructCop{lulz: true}
+    assert_raise(ArgumentError, fn ->
+      ast = quote do: %DefstructBeforeStructCop{test: "invalid"}
 
       Code.eval_quoted(ast, [], __ENV__)
     end)
   end
 
   test "__using__ can be invoked after defstruct" do
-    assert_raise(RuntimeError, "for teh lulz!", fn ->
-      ast = quote do: %DefstructAfterStructCop{lulz: true}
+    assert_raise(ArgumentError, fn ->
+      ast = quote do: %DefstructAfterStructCop{test: "invalid"}
 
       Code.eval_quoted(ast, [], __ENV__)
     end)

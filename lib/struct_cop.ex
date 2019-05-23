@@ -26,8 +26,15 @@ defmodule StructCop do
       defoverridable __struct__: 1
 
       def __struct__(kv) do
-        struct = super(kv)
-        validate(struct)
+        {__struct__(), schema()}
+        |> Ecto.Changeset.cast(Enum.into(kv, %{}), Map.keys(schema()))
+        |> case do
+          %{valid?: true} = changeset ->
+            Ecto.Changeset.apply_changes(changeset)
+
+          %{valid?: false} = changeset ->
+            raise ArgumentError, "validation failed on: #{inspect(changeset.errors)}"
+        end
       end
     end
   end
