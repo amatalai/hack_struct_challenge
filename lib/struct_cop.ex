@@ -1,17 +1,27 @@
 defmodule StructCop do
   defmacro __using__(_opts) do
     if struct_defined?(__CALLER__) do
-      handle_defined_struct()
+      hack_struct()
     else
-      handle_struct_to_be_defined()
+      hack_defstruct()
     end
+  end
+
+  @doc false
+  defmacro defstruct(kv) do
+    [
+      quote do
+        Kernel.defstruct(unquote(kv))
+      end,
+      hack_struct()
+    ]
   end
 
   defp struct_defined?(caller) do
     !!Macro.Env.vars(caller)[:struct]
   end
 
-  defp handle_defined_struct do
+  defp hack_struct do
     quote do
       defoverridable __struct__: 1
 
@@ -22,24 +32,10 @@ defmodule StructCop do
     end
   end
 
-  defp handle_struct_to_be_defined do
+  defp hack_defstruct do
     quote do
       import Kernel, except: [defstruct: 1]
       import StructCop, only: [defstruct: 1]
-    end
-  end
-
-  @doc false
-  defmacro defstruct(kv) do
-    quote do
-      Kernel.defstruct(unquote(kv))
-
-      defoverridable __struct__: 1
-
-      def __struct__(kv) do
-        struct = super(kv)
-        validate(struct)
-      end
     end
   end
 end
