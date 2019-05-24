@@ -1,4 +1,7 @@
 defmodule StructCop do
+  @callback schema :: map
+  @callback validations!(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+
   defmacro __using__(_opts) do
     if struct_defined?(__CALLER__) do
       hack_struct()
@@ -23,14 +26,21 @@ defmodule StructCop do
 
   defp hack_struct do
     quote do
-      defoverridable __struct__: 1
+      @behaviour StructCop
+
+      def validations!(changeset), do: changeset
+
+      defoverridable __struct__: 1, validations!: 1
 
       def __struct__(kv) do
-        {__struct__(), schema()}
+        {%{}, schema()}
         |> Ecto.Changeset.cast(Enum.into(kv, %{}), Map.keys(schema()))
+        |> validations!()
         |> case do
           %{valid?: true} = changeset ->
-            Ecto.Changeset.apply_changes(changeset)
+            changeset
+            |> Ecto.Changeset.apply_changes()
+            |> super()
 
           %{valid?: false} = changeset ->
             raise ArgumentError, "validation failed on: #{inspect(changeset.errors)}"
