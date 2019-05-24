@@ -1,35 +1,31 @@
 defmodule StructCopTest do
   use ExUnit.Case, async: true
 
-  defmodule DefstructBeforeStructCop do
-    defstruct [:test]
+  describe "casts types correctly" do
+    test "when building struct directly" do
+      assert %CastType{integer: 1} == %CastType{integer: "1"}
+    end
 
-    use StructCop
-
-    def schema, do: %{test: :integer}
+    test "when using struct! function" do
+      assert struct!(CastType, integer: 1) == struct!(CastType, integer: "1")
+    end
   end
 
-  defmodule DefstructAfterStructCop do
-    use StructCop
+  describe "__using__" do
+    test "works when invoked before defstruct" do
+      assert_raise(ArgumentError, fn ->
+        ast = quote do: %DefstructBeforeStructCop{test: "invalid"}
 
-    defstruct [:test]
+        Code.eval_quoted(ast, [], __ENV__)
+      end)
+    end
 
-    def schema, do: %{test: :boolean}
-  end
+    test "works when invoked after defstruct" do
+      assert_raise(ArgumentError, fn ->
+        ast = quote do: %DefstructAfterStructCop{test: "invalid"}
 
-  test "__using__ can be invoked before defstruct" do
-    assert_raise(ArgumentError, fn ->
-      ast = quote do: %DefstructBeforeStructCop{test: "invalid"}
-
-      Code.eval_quoted(ast, [], __ENV__)
-    end)
-  end
-
-  test "__using__ can be invoked after defstruct" do
-    assert_raise(ArgumentError, fn ->
-      ast = quote do: %DefstructAfterStructCop{test: "invalid"}
-
-      Code.eval_quoted(ast, [], __ENV__)
-    end)
+        Code.eval_quoted(ast, [], __ENV__)
+      end)
+    end
   end
 end
