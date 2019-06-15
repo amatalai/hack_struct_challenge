@@ -1,4 +1,4 @@
-defmodule StructCop do
+defmodule HackStructChallenge do
   @callback validations!(struct) :: struct | no_return
 
   defmacro __using__(_opts) do
@@ -25,7 +25,7 @@ defmodule StructCop do
 
   defp hack_struct do
     quote do
-      @behaviour StructCop
+      @behaviour HackStructChallenge
 
       def validations!(changeset), do: changeset
 
@@ -41,7 +41,7 @@ defmodule StructCop do
   defp hack_defstruct do
     quote do
       import Kernel, except: [defstruct: 1]
-      import StructCop, only: [defstruct: 1]
+      import HackStructChallenge, only: [defstruct: 1]
     end
   end
 end

@@ -1,1 +1,1 @@
-# StructCop
+# HackStructChallenge

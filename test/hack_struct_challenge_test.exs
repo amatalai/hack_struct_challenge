@@ -1,10 +1,10 @@
-defmodule StructCopTest do
+defmodule HackStructChallengeTest do
   use ExUnit.Case, async: true
 
   defmodule DefstructBeforeUsing do
     defstruct [:lulz]
 
-    use StructCop
+    use HackStructChallenge
 
     def validations!(struct) do
       if struct.lulz, do: raise("for teh lulz!")
@@ -14,7 +14,7 @@ defmodule StructCopTest do
   end
 
   defmodule DefstructAfterUsing do
-    use StructCop
+    use HackStructChallenge
 
     defstruct [:lulz]
 
@@ -27,6 +27,7 @@ defmodule StructCopTest do
 
   describe "__using__" do
     test "works when invoked before defstruct" do
+      assert %DefstructBeforeUsing{}
       assert %DefstructBeforeUsing{lulz: false}
 
       assert_raise(RuntimeError, fn ->
@@ -37,6 +38,7 @@ defmodule StructCopTest do
     end
 
     test "works when invoked after defstruct" do
+      assert %DefstructBeforeUsing{}
       assert %DefstructAfterUsing{lulz: false}
 
       assert_raise(RuntimeError, fn ->

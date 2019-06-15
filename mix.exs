@@ -1,11 +1,11 @@
-defmodule StructCop.MixProject do
+defmodule HackStructChallenge.MixProject do
   use Mix.Project
 
   @version "0.1.0"
 
   def project do
     [
-      app: :struct_cop,
+      app: :hack_struct_challenge,
       deps: deps(),
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,

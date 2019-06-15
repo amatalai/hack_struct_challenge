@@ -20,7 +20,7 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-struct_cop-*.tar
+hack_struct_challenge-*.tar
 
 # Ignore asdf version manager files
 .tool-versions
